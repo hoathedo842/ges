@@ -1,0 +1,67 @@
+services:
+  app:
+    build:
+      context: .
+      target: development
+
+    ports:
+      - '${PORT}:8080'
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+    command: npm run start:dev
+
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+    depends_on:
+      - mongo
+
+    networks:
+      - ges-network
+
+  mongo:
+    image: mongo
+
+    restart: always
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+
+    volumes:
+      - ./mongo-data:/data/db
+
+    ports:
+      - '27017:27017'
+
+    networks:
+      - ges-network
+
+  mongo-express:
+    image: mongo-express
+
+    restart: always
+
+    ports:
+      - '8081:8081'
+
+    environment:
+      ME_CONFIG_MONGODB_URL: ${MONGODB_URI}
+
+      ME_CONFIG_BASICAUTH_ENABLED: true
+
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_CONFIG_BASICAUTH_USERNAME}
+
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_CONFIG_BASICAUTH_PASSWORD}
+
+    depends_on:
+      - mongo
+
+    networks:
+      - ges-network
+
+networks:
+  ges-network:
+    driver: bridge
