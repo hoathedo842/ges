@@ -26,7 +26,7 @@ export class AuthService {
       email: user.email,
       role: user.role,
     };
-    console.log('Đã tạo token:', payload);
+
     return {
       access_token: this.jwtService.sign(payload),
     };
